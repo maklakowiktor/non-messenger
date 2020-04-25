@@ -5,12 +5,7 @@ const socketio = require('socket.io');
 const bodyParser = require('body-parser');
 const formatMessage = require('./utils/messages');
 const mongoose = require('mongoose');
-// Шифрование
-const bCrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const UserMongo = require('./public/js/user');
-
-
 
 const urlencodedParser = bodyParser.urlencoded({extended: false});
 
