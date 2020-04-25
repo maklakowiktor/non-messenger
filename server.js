@@ -24,8 +24,7 @@ const io = socketio(server);
 // Задаем параметры статических папок
 
 // Укажем роуты                   
-app.get("/", function (req, res) {
-  mongoose.connect('mongodb://localhost/login', { useNewUrlParser: true, useUnifiedTopology: true });
+app.get("/", async function (req, res) {
   res.sendFile(__dirname + '/public/login.html');
 });
 
@@ -134,4 +133,16 @@ app.get("/*", function(req, res) {
   res.redirect('/');
 })
 
-server.listen(PORT, () => console.log(`Запуск сервера на порту ${PORT}`));
+async function start() {
+  try {
+    await mongoose.connect('mongodb+srv://lincoln:1@cluster0-bwlcs.mongodb.net/login', { 
+      useNewUrlParser: true, 
+      useUnifiedTopology: true 
+    });
+    server.listen(PORT, () => console.log(`Сервер был запущен. Порт: ${PORT}`));
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+start();
