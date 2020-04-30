@@ -2,6 +2,7 @@ const chatForm = document.getElementById('chat-form');
 const chatMessages = document.querySelector('.chat-messages');
 const roomName = document.getElementById('room-name');
 const userList = document.getElementById('users');
+const preloader = document.querySelector('.square-spin');
 
 let userChat = {
   username: null,
@@ -18,10 +19,12 @@ socket.on('joinToChat', (username, room, messages) => {
     room
   }
   // Show preloader
+  
   messages.forEach( item => {
     outputOldMessage(item);
   })
   // Hide preloadery
+  preloader.style = 'opacity: 0;'
   if(userChat.username) {
     socket.emit('joinRoom', userChat.username, userChat.room );
   } else {

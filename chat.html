@@ -10,7 +10,23 @@
       crossorigin="anonymous"
     />
     <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/loaders.min.css" />
+    
     <title>ChatCord App</title>
+
+    <style>
+      .square-spin > div {
+      background-color:rgb(153, 179, 198);
+    }
+    .square-spin {
+    position: absolute;
+    margin: 35px 0 0 270px;
+    opacity: 1;
+    transform: scale(2.8, 2.8);
+    }
+    
+    </style>
+    
   </head>
   <body>
     <div class="chat-container">
@@ -25,7 +41,9 @@
           <h3><i class="fas fa-users"></i> Users</h3>
           <ul id="users"></ul>
         </div>
-        <div class="chat-messages"></div>
+        <div class="chat-messages">
+          <div class="square-spin"><div></div></div>
+        </div>
       </main>
       <div class="chat-form-container">
         <form id="chat-form">
