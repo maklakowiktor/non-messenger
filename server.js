@@ -149,7 +149,7 @@ app.get("/*", function(req, res) {
 // mongodb+srv://lincoln:1@cluster0-bwlcs.mongodb.net/login
 async function start() {
   try {
-    await mongoose.connect('mongodb://localhost:27017/login', { 
+    await mongoose.connect('mongodb+srv://lincoln:1@cluster0-bwlcs.mongodb.net/login', { 
       useNewUrlParser: true, 
       useUnifiedTopology: true 
     });
