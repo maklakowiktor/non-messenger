@@ -70,7 +70,7 @@ function outputMessage(message) {
   </p>`;
   document.querySelector('.chat-messages').appendChild(div);
 }
-
+// Output messages history
 function outputOldMessage(message) {
   const div = document.createElement('div');
   div.classList.add('message');
