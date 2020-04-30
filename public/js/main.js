@@ -5,18 +5,23 @@ const userList = document.getElementById('users');
 
 let userChat = {
   username: null,
-  room: null
+  room: null,
 }
 
 const socket = io();
 
 socket.emit('loadClient')
-//Получение пользователя и комнаты методом POST
-socket.on('joinToChat', (username, room) => {
+//Получение пользователя и комнаты
+socket.on('joinToChat', (username, room, messages) => {
   userChat = {
     username,
     room
   }
+  // Show preloader
+  messages.forEach( item => {
+    outputOldMessage(item);
+  })
+  // Hide preloadery
   if(userChat.username) {
     socket.emit('joinRoom', userChat.username, userChat.room );
   } else {
@@ -27,13 +32,11 @@ socket.on('joinToChat', (username, room) => {
 
 // Получить комнату и пользователя
 socket.on('roomUsers', ({room, users}) => {
-  console.log(room);
-  console.log(users);
   outputRoomName(room);
   outputUsers(users);
 });
 
-// Сообщение от сервера
+// Сообщение от сервера 
 socket.on('message', message => {
   outputMessage(message);
 
@@ -44,16 +47,14 @@ socket.on('message', message => {
 // Поддтверждение сообщения
 chatForm.addEventListener('submit', e => {
   e.preventDefault();
+    // Get message text
+    const msg = e.target.elements.msg.value;
 
-  // Get message text
-  const msg = e.target.elements.msg.value;
-
-  // Emit message to server
-  socket.emit('chatMessage', msg);
-
-  // Clear input
-  e.target.elements.msg.value = '';
-  e.target.elements.msg.focus();
+    // Emit message to server
+    socket.emit('chatMessage', msg, userChat.username, userChat.room);
+    // Clear input
+    e.target.elements.msg.value = '';
+    e.target.elements.msg.focus();
 });
 
 // Output message to DOM
@@ -63,6 +64,16 @@ function outputMessage(message) {
   div.innerHTML = `<p class="meta">${message.username} <span>${message.time}</span></p>
   <p class="text">
     ${message.text}
+  </p>`;
+  document.querySelector('.chat-messages').appendChild(div);
+}
+
+function outputOldMessage(message) {
+  const div = document.createElement('div');
+  div.classList.add('message');
+  div.innerHTML = `<p class="meta">${message.sender} <span>${message.send_time}</span></p>
+  <p class="text">
+    ${message.message}
   </p>`;
   document.querySelector('.chat-messages').appendChild(div);
 }

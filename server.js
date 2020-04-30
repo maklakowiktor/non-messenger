@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const formatMessage = require('./utils/messages');
 const mongoose = require('mongoose');
 const UserMongo = require('./public/js/user');
+const MsgsMongo = require('./public/js/msgs');
 
 const urlencodedParser = bodyParser.urlencoded({extended: false});
 
@@ -49,14 +50,21 @@ io.on('connection', socket => {
     res.sendFile(__dirname + '/chat.html');
   });
   
-  socket.on('loadClient', () => {
-    socket.emit('joinToChat', username, room);
+  socket.on('loadClient', async () => {
+    let messages = [];
+    await MsgsMongo
+      .find({ room }, (err, res) => {
+        if (err) return console.error(err);
+        messages.push(...res);
+      })
+    socket.emit('joinToChat', username, room, messages);
+    console.log(`Произошло извлечение ${messages.length} записей в комнату ${room}`);
   })
 
 
   // Прием логина и пароля c клиента (login.js)
-  socket.on('clickReg', (login, password) => {
-    UserMongo({ name: login, pass: password })
+  socket.on('clickReg', async (login, password) => {
+    await UserMongo({ name: login, pass: password })
       .save((err) => {
         if (err) return handleError(err);
         console.log(`Пользователь ${login} был сохранён`);
@@ -64,8 +72,8 @@ io.on('connection', socket => {
     socket.emit('successReg', login); 
   });
 
-  socket.on('clickDuck', (login, password) => {
-      UserMongo
+  socket.on('clickDuck', async (login, password) => {
+      await UserMongo
         .find({ name: login, pass: password }, (err, res) => {
           if (err) return console.error(err);
           if(res.length) { 
@@ -83,16 +91,15 @@ io.on('connection', socket => {
     socket.join(user.room);
 
     // Приветствие пользователя
-    socket.emit('message', formatMessage(botName, 'Добро пожаловать в чат!'));
+    // socket.emit('message', formatMessage(botName, 'Добро пожаловать в чат!'));
 
-    // Броадкаст при подключении пользователя
+    // Броадкаст приветствия при подключении пользователя
     socket.broadcast
       .to(user.room)
       .emit(
         'message',
         formatMessage(botName, `${user.username} присоединился к чату`)
       );
-    console.log(getRoomUsers(user.room));
     // Отправляем пользователей и комнату
     io.to(user.room).emit('roomUsers', {
       room: user.room,
@@ -102,10 +109,17 @@ io.on('connection', socket => {
 
 
   // Прослушивание сообщения чата
-  socket.on('chatMessage', msg => {
+  socket.on('chatMessage', async (msg, sender, room) => {
     const user = getCurrentUser(socket.id);
 
     io.to(user.room).emit('message', formatMessage(user.username, msg));
+
+    await MsgsMongo({message: msg, sender, send_time: Date(), room: room })
+      .save((err) => {
+        if (err) return handleError(err);
+        console.log(`New message in DB ${msg}`);
+      });
+
   });
 
   // Запуск когда пользователь отключается
@@ -132,10 +146,10 @@ const PORT = process.env.PORT || 5000;
 app.get("/*", function(req, res) {
   res.redirect('/');
 })
-
+// mongodb+srv://lincoln:1@cluster0-bwlcs.mongodb.net/login
 async function start() {
   try {
-    await mongoose.connect('mongodb+srv://lincoln:1@cluster0-bwlcs.mongodb.net/login', { 
+    await mongoose.connect('mongodb://localhost:27017/login', { 
       useNewUrlParser: true, 
       useUnifiedTopology: true 
     });

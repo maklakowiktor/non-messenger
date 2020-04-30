@@ -4,8 +4,8 @@
   "description": "Realtime chat app with rooms",
   "main": "server.js",
   "scripts": {
-    "start": "node server",
-    "dev": "nodemon --ignore sessions/ server"
+    "start": "start http://localhost:5000 & node server",
+    "dev": "nodemon server"
   },
   "author": "Андрей Рубцов",
   "license": "КРУ",
