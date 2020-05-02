@@ -50,12 +50,8 @@ socket.on('message', message => {
 // Поддтверждение сообщения
 chatForm.addEventListener('submit', e => {
   e.preventDefault();
-    // Get message text
     const msg = e.target.elements.msg.value;
-
-    // Emit message to server
     socket.emit('chatMessage', msg, userChat.username, userChat.room);
-    // Clear input
     e.target.elements.msg.value = '';
     e.target.elements.msg.focus();
 });
@@ -89,6 +85,6 @@ function outputRoomName(room) {
 // Add users to DOM
 function outputUsers(users) {
   userList.innerHTML = `
-    ${users.map(user => `<li>${user.username}</li>`).join('')}
+    ${users.map(user => userChat.username == user.username ? `<li><b>${user.username}</b> (Вы)</li>` : `<li>${user.username}</li>`).join('')}
   `;
 }

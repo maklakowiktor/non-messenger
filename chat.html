@@ -11,34 +11,33 @@
     />
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/loaders.min.css" />
-    
-    <title>ChatCord App</title>
+    <title>Winchester Chat</title>
 
     <style>
       .square-spin > div {
-      background-color:rgb(153, 179, 198);
-    }
-    .square-spin {
-    position: absolute;
-    margin: 35px 0 0 270px;
-    opacity: 1;
-    transform: scale(2.8, 2.8);
-    }
-    
+        background-color:rgb(153, 179, 198);
+      }
+      .square-spin {
+        position: absolute;
+        margin: 35px 0 0 270px;
+        opacity: 1;
+        transform: scale(2.8, 2.8);
+      }
+
     </style>
     
   </head>
   <body>
     <div class="chat-container">
       <header class="chat-header">
-        <h1><i class="fas fa-smile"></i> ChatCord</h1>
-        <a href="index.html" class="btn">Leave Room</a>
+        <h1><i class="fas">&#127918;</i> Winchester Chat</h1>
+        <a href="/" class="btn">Свалить</a>
       </header>
       <main class="chat-main">
         <div class="chat-sidebar">
-          <h3><i class="fas fa-comments"></i> Room Name:</h3>
+          <h3><i class="fas fa-comments"></i> Комната:</h3>
           <h2 id="room-name"></h2>
-          <h3><i class="fas fa-users"></i> Users</h3>
+          <h3><i class="fas fa-users"></i> Онлайн</h3>
           <ul id="users"></ul>
         </div>
         <div class="chat-messages">
@@ -50,10 +49,14 @@
           <input
             id="msg"
             type="text"
-            placeholder="Enter Message"
+            placeholder="Введите сообщение..."
             required
             autocomplete="off"
           />
+          <div class="attach" style="background: url(public/img/attach.svg); background-size: 30px;">
+            <label for="upload-photo"></label>
+            <input type="file" name="photo" id="upload-photo" hidden/>
+          </div>
           <button class="btn"><i class="fas fa-paper-plane"></i> Отправить</button>
         </form>
       </div>

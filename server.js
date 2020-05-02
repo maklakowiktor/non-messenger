@@ -3,10 +3,11 @@ const http = require('http');
 const express = require('express');
 const socketio = require('socket.io');
 const bodyParser = require('body-parser');
-const formatMessage = require('./utils/messages');
 const mongoose = require('mongoose');
+const multer = require('multer');
 const UserMongo = require('./public/js/user');
 const MsgsMongo = require('./public/js/msgs');
+const formatMessage = require('./utils/messages');
 
 const urlencodedParser = bodyParser.urlencoded({extended: false});
 
@@ -39,7 +40,7 @@ app.get("/rooms", function(req, res) {
 app.use(express.static(path.join(__dirname, 'public')));
 
 const botName = 'ChatCord Bot';
-let username, room
+let username, room;
 
 // Запуск при подключении клиентов
 io.on('connection', socket => {
@@ -51,12 +52,15 @@ io.on('connection', socket => {
   });
   
   socket.on('loadClient', async () => {
+    console.log(username, room);
     let messages = [];
-    await MsgsMongo
+    while (!messages.length) {
+      await MsgsMongo
       .find({ room }, (err, res) => {
         if (err) return console.error(err);
         messages.push(...res);
       })
+    }
     socket.emit('joinToChat', username, room, messages);
     console.log(`Произошло извлечение ${messages.length} записей в комнату ${room}`);
   })
