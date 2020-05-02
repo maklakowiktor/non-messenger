@@ -34,12 +34,19 @@ app.get("/rooms", function(req, res) {
   res.sendFile(__dirname + '/index.html');
 })
 
-
-
+app.post("/chat/upload", function (req, res, next) {
+  let filedata = req.file;
+  console.log(filedata);
+  if(!filedata)
+      res.send("Ошибка при загрузке файла");
+  else
+      res.send("Файл загружен");
+});
 
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(multer({dest: "uploads"}).single("filedata"));
 
-const botName = 'ChatCord Bot';
+const botName = 'Чат';
 let username, room;
 
 // Запуск при подключении клиентов
