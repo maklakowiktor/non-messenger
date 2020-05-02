@@ -45,6 +45,9 @@
         </div>
       </main>
       <div class="chat-form-container">
+        <div class="typing" style="position: absolute; width: 100%; bottom: 60px;">
+            <span class="span-typing" style="transition: .7s;"></span>
+          </div>
         <form id="chat-form">
           <input
             id="msg"
@@ -52,6 +55,7 @@
             placeholder="Введите сообщение..."
             required
             autocomplete="off"
+            oninput="typing();"
           />
           <div class="attach">
             <label for="upload-photo">&#128206;</label>

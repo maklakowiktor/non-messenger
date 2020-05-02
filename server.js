@@ -150,6 +150,12 @@ io.on('connection', socket => {
       });
     }
   });
+
+  socket.on('serverTyping', (name, room) => {  
+    socket.to(room).emit('serverTyping', name);
+  })
+
+
 });
 
 const PORT = process.env.PORT || 5000;

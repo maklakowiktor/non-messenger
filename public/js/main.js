@@ -42,10 +42,21 @@ socket.on('roomUsers', ({room, users}) => {
 // Сообщение от сервера 
 socket.on('message', message => {
   outputMessage(message);
-
   // Скролл вниз
   chatMessages.scrollTop = chatMessages.scrollHeight;
 });
+
+// let typing = false;
+let timeout = undefined;
+
+socket.on('serverTyping', (name) => {
+  clearTimeout(timeout);
+  let tps = document.querySelector('.span-typing');
+  let typingUsers = [];
+  typingUsers.push(name);
+  tps.innerHTML = `${typingUsers} пишет...`;
+  timeout = setTimeout(() => { tps.innerHTML = '' }, 3000);
+})
 
 // Поддтверждение сообщения
 chatForm.addEventListener('submit', e => {
@@ -75,6 +86,7 @@ function outputOldMessage(message) {
     ${message.message}
   </p>`;
   document.querySelector('.chat-messages').appendChild(div);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
 // Add room name to DOM
@@ -87,4 +99,8 @@ function outputUsers(users) {
   userList.innerHTML = `
     ${users.map(user => userChat.username == user.username ? `<li><b>${user.username}</b> (Вы)</li>` : `<li>${user.username}</li>`).join('')}
   `;
+}
+
+function typing() {
+  socket.emit('serverTyping', userChat.username, userChat.room);
 }
