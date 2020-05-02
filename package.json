@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "start http://localhost:5000 & node server",
-    "dev": "nodemon server"
+    "dev": "start http://localhost:5000 & nodemon server"
   },
   "author": "Андрей Рубцов",
   "license": "КРУ",

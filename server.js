@@ -59,7 +59,6 @@ io.on('connection', socket => {
   });
   
   socket.on('loadClient', async () => {
-    console.log(username, room);
     let messages = [];
     while (!messages.length) {
       await MsgsMongo

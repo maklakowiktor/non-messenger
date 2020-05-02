@@ -69,22 +69,38 @@ chatForm.addEventListener('submit', e => {
 
 // Output message to DOM
 function outputMessage(message) {
+  // Создаём контейнер для одного сообщения
   const div = document.createElement('div');
   div.classList.add('message');
-  div.innerHTML = `<p class="meta">${message.username} <span>${message.time}</span></p>
-  <p class="text">
-    ${message.text}
-  </p>`;
+  // Тег p, содержащий имя и дату письма
+  const p = document.createElement('p');
+  p.classList.add('meta');
+// Создаём второй контейнер, для содержимого сообщения
+  const divt = document.createElement('div');
+  divt.classList.add('text');
+// Добавляем содержимое внутрь созданных элементов
+  p.innerHTML = `${message.username}<span> ${message.time}</span>`;
+  divt.innerText = message.text;
+// Соединяем всё элементы
+  div.appendChild(p);
+  div.appendChild(divt);
+// Присоединяем готовое сообщение ко всему диалогу
   document.querySelector('.chat-messages').appendChild(div);
 }
+
 // Output messages history
 function outputOldMessage(message) {
   const div = document.createElement('div');
   div.classList.add('message');
-  div.innerHTML = `<p class="meta">${message.sender} <span>${message.send_time}</span></p>
-  <p class="text">
-    ${message.message}
-  </p>`;
+  const p = document.createElement('p');
+  p.classList.add('meta');
+  const divt = document.createElement('div');
+  divt.classList.add('text');
+  p.innerHTML = `${message.sender}<span> ${message.send_time}</span>`;
+  divt.innerText = message.message;
+  div.appendChild(p);
+  div.appendChild(divt);
+  
   document.querySelector('.chat-messages').appendChild(div);
   chatMessages.scrollTop = chatMessages.scrollHeight;
 }
