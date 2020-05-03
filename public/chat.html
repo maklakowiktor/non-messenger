@@ -12,22 +12,29 @@
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/loaders.min.css" />
     <title>Winchester Chat</title>
-
-    <style>
-      .square-spin > div {
-        background-color:rgb(153, 179, 198);
-      }
-      .square-spin {
-        position: absolute;
-        margin: 35px 0 0 270px;
-        opacity: 1;
-        transform: scale(2.8, 2.8);
-      }
-
-    </style>
-    
   </head>
   <body>
+    <div id="context-menu">
+      <div class="item">
+        <i class="fa fa-cut"></i> Cut
+      </div>
+      <div class="item">
+        <i class="fa fa-clone"></i> Copy
+      </div>
+      <div class="item">
+        <i class="fa fa-paste"></i> Paste
+      </div>
+      <div class="item">
+        <i class="fa fa-trash-o"></i> Delete
+      </div>
+      <hr>
+      <div class="item">
+        <i class="fa fa-refresh"></i> Reload
+      </div>
+      <div class="item">
+        <i class="fa fa-times"></i> Exit
+      </div>
+    </div>
     <div class="chat-container">
       <header class="chat-header">
         <h1><i class="fas">&#127918;</i> Winchester Chat</h1>
@@ -47,7 +54,7 @@
       <div class="chat-form-container">
         <div class="typing" style="position: absolute; width: 100%; bottom: 60px;">
             <span class="span-typing" style="transition: .7s;"></span>
-          </div>
+        </div>
         <form id="chat-form">
           <input
             id="msg"
@@ -57,9 +64,12 @@
             autocomplete="off"
             oninput="typing();"
           />
+          <div class="count-files-container">
+            <sup id="countFiles" class="count-files"></sup>
+          </div>
           <div class="attach">
             <label for="upload-photo">&#128206;</label>
-            <input type="file" name="photo" id="upload-photo" hidden/>
+            <input type="file" name="photo" id="upload-photo" accept="image/png, image/jpeg, image/jpg" onchange="countFiles(this);" multiple hidden/>
           </div>
           <button class="btn"><i class="fas fa-paper-plane"></i> Отправить</button>
         </form>

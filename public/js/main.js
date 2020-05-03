@@ -3,11 +3,9 @@ const chatMessages = document.querySelector('.chat-messages');
 const roomName = document.getElementById('room-name');
 const userList = document.getElementById('users');
 const preloader = document.querySelector('.square-spin');
-
-let userChat = {
-  username: null,
-  room: null,
-}
+let timeout, 
+    attaches = false,
+    userChat = { username: null, room: null };
 
 const socket = io();
 
@@ -18,19 +16,21 @@ socket.on('joinToChat', (username, room, messages) => {
     username,
     room
   }
-  // Show preloader
+  // Показать прелоадер
   
   messages.forEach( item => {
     outputOldMessage(item);
   })
-  // Hide preloadery
-  preloader.style = 'opacity: 0;'
+  // Скрываем прелоадер
+  preloader.remove();
+  let msgs = document.querySelectorAll('.message');
+  msgs.forEach(item => item.style.opacity = 1);
+  // preloader.style = 'opacity: 0;'
   if(userChat.username) {
     socket.emit('joinRoom', userChat.username, userChat.room );
   } else {
     window.location.href = '/rooms'
   }
-  // Присоединение к комнате
 })
 
 // Получить комнату и пользователя
@@ -42,13 +42,10 @@ socket.on('roomUsers', ({room, users}) => {
 // Сообщение от сервера 
 socket.on('message', message => {
   outputMessage(message);
-  // Скролл вниз
-  chatMessages.scrollTop = chatMessages.scrollHeight;
+  chatMessages.scrollTop = chatMessages.scrollHeight; // Скролл вниз
 });
 
-// let typing = false;
-let timeout = undefined;
-
+// Показываем/скрываем typing
 socket.on('serverTyping', (name) => {
   clearTimeout(timeout);
   let tps = document.querySelector('.span-typing');
@@ -61,24 +58,33 @@ socket.on('serverTyping', (name) => {
 // Поддтверждение сообщения
 chatForm.addEventListener('submit', e => {
   e.preventDefault();
-    const msg = e.target.elements.msg.value;
-    socket.emit('chatMessage', msg, userChat.username, userChat.room);
-    e.target.elements.msg.value = '';
-    e.target.elements.msg.focus();
+  const msg = e.target.elements.msg.value;
+  console.log(msg);
+  console.log(e.target.elements.photo.files);
+  // socket.emit('chatMessage', msg, userChat.username, userChat.room);
+  // e.target.elements.msg.value = '';
+  // e.target.elements.msg.focus();
 });
+
+function countFiles(those) {
+  let outCf = document.getElementById('countFiles');
+  let cf = those.files.length;
+  if(cf == 0) {
+    outCf.innerText = '';
+  } else {
+    outCf.innerText = cf;
+  }
+}
 
 // Output message to DOM
 function outputMessage(message) {
-  // Создаём контейнер для одного сообщения
-  const div = document.createElement('div');
+  const div = document.createElement('div'); // Создаём контейнер для одного сообщения
   div.classList.add('message');
-  // Тег p, содержащий имя и дату письма
-  const p = document.createElement('p');
+  const p = document.createElement('p'); // Тег p, содержащий имя и дату письма
   p.classList.add('meta');
-// Создаём второй контейнер, для содержимого сообщения
-  const divt = document.createElement('div');
+  const divt = document.createElement('div');// Создаём второй контейнер, для содержимого сообщения
   divt.classList.add('text');
-// Добавляем содержимое внутрь созданных элементов
+  // Добавляем содержимое внутрь созданных элементов
   p.innerHTML = `${message.username}<span> ${message.time}</span>`;
   divt.innerText = message.text;
 // Соединяем всё элементы
@@ -120,3 +126,20 @@ function outputUsers(users) {
 function typing() {
   socket.emit('serverTyping', userChat.username, userChat.room);
 }
+
+window.addEventListener("contextmenu",function(event){
+  event.preventDefault();
+  if(event.target.classList.contains('message') || event.target.classList.contains('meta') || event.target.classList.contains('text')) {
+    var contextElement = document.getElementById("context-menu");
+    contextElement.style.top = event.clientY + "px";
+    contextElement.style.left = event.clientX + "px";
+    contextElement.classList.add("active");
+  } else {
+    document.getElementById("context-menu").classList.remove("active");
+  }
+  
+});
+
+window.addEventListener("click",function(){
+  document.getElementById("context-menu").classList.remove("active");
+});

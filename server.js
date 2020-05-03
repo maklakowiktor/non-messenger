@@ -31,7 +31,7 @@ app.get("/", async function (req, res) {
 });
 
 app.get("/rooms", function(req, res) {
-  res.sendFile(__dirname + '/index.html');
+  res.sendFile(__dirname + '/public/index.html');
 })
 
 app.post("/chat/upload", function (req, res, next) {
@@ -55,18 +55,19 @@ io.on('connection', socket => {
   app.post("/chat", urlencodedParser, function(req, res) {
     username = req.body.username
     room =  req.body.room
-    res.sendFile(__dirname + '/chat.html');
+    res.sendFile(__dirname + '/public/chat.html');
   });
   
   socket.on('loadClient', async () => {
     let messages = [];
-    while (!messages.length) {
+    // while (!messages.length) {
       await MsgsMongo
       .find({ room }, (err, res) => {
         if (err) return console.error(err);
         messages.push(...res);
       })
-    }
+    // }
+    
     socket.emit('joinToChat', username, room, messages);
     console.log(`Произошло извлечение ${messages.length} записей в комнату ${room}`);
   })
