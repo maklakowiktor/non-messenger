@@ -23,8 +23,6 @@ socket.on('joinToChat', (username, room, messages) => {
   })
   // Скрываем прелоадер
   preloader.remove();
-  let msgs = document.querySelectorAll('.message');
-  msgs.forEach(item => item.style.opacity = 1);
   // preloader.style = 'opacity: 0;'
   if(userChat.username) {
     socket.emit('joinRoom', userChat.username, userChat.room );
@@ -55,60 +53,52 @@ socket.on('serverTyping', (name) => {
   timeout = setTimeout(() => { tps.innerHTML = '' }, 3000);
 })
 
-// Поддтверждение сообщения
-chatForm.addEventListener('submit', e => {
+// Отправка сообщения/формы
+chatForm.addEventListener('submit', async e => {
   e.preventDefault();
+  let linkImg;
   const msg = e.target.elements.msg.value;
   const images = e.target.elements.photo.files[0];
-  if (images.length) {
-    return fetchImage(e);
+  if (images !== undefined) {
+    linkImg = await fetchImage(e);
   }
-  socket.emit('chatMessage', msg, userChat.username, userChat.room);
-  e.target.elements.msg.value = '';
+
+  socket.emit('chatMessage', msg, userChat.username, userChat.room, linkImg);
+
+  document.querySelector('form').reset();
+  document.getElementById('countFiles').innerText = '';
+  // e.target.elements.msg.value = '';
+  // e.target.elements.photo.value = '';
   e.target.elements.msg.focus();
+
 });
 
-
-
 async function fetchImage(e) {
-  const msg = e.target.elements.msg.value;
+  // const msg = e.target.elements.msg.value;
   const image = e.target.elements.photo.files[0];
-
   const formData = new FormData();
-  const fileField = document.querySelector('input[type="file"]');
-
-  formData.append('username', userChat.username);
-  formData.append('avatar', fileField.files[0]);
+  
+  // formData.set('username', userChat.username);
+  // formData.set('msg', msg);
+  formData.set('img', image);
 
   try {
     const response = await fetch('/chat/upload', {
-      method: 'PUT',
+      method: 'POST',
       body: formData
     });
     const result = await response.json();
-    console.log('Успех:', JSON.stringify(result));
+    return result.filePath;
   } catch (error) {
     console.error('Ошибка:', error);
   }
-
-
-
-  let response = await fetch('/article/formdata/post/user', {
-    method: 'POST',
-    body: new FormData(formElem)
-  });
-    let result = await response.json();
-    console.log(result.message);
-
-  // socket.emit('chatMessage', msg, userChat.username, userChat.room, images);
-  // e.target.elements.msg.value = '';
-  // e.target.elements.msg.focus();
 }
+
 
 function countFiles(those) {
   let outCf = document.getElementById('countFiles');
   let cf = those.files.length;
-  console.log(those.files);
+
   if(cf == 0) {
     outCf.innerText = '';
   } else {
@@ -127,6 +117,9 @@ function outputMessage(message) {
   // Добавляем содержимое внутрь созданных элементов
   p.innerHTML = `${message.username}<span> ${message.time}</span>`;
   divt.innerText = message.text;
+  if(message.linkImg) {
+    divt.innerHTML = divt.innerHTML + `<div class="img-inner-message"><img src="${message.linkImg}"></div>`
+  }
 // Соединяем всё элементы
   div.appendChild(p);
   div.appendChild(divt);
@@ -144,6 +137,10 @@ function outputOldMessage(message) {
   divt.classList.add('text');
   p.innerHTML = `${message.sender}<span> ${message.send_time}</span>`;
   divt.innerText = message.message;
+  if(message.img) {
+    divt.innerHTML = divt.innerHTML + `<div class="img-inner-message"><img src="${message.img}"></div>`
+  }
+  
   div.appendChild(p);
   div.appendChild(divt);
   

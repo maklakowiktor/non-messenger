@@ -11,6 +11,7 @@ const formatMessage = require('./utils/messages');
 
 const urlencodedParser = bodyParser.urlencoded({extended: false});
 
+
 const {
   userJoin,
   getCurrentUser,
@@ -23,10 +24,26 @@ const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
-// Задаем параметры статических папок
-app.use(express.static(path.join(__dirname, 'public')));
-// Используем middleware для загрузки изображений на сервер
-app.use(multer({dest: "uploads"}).single("filedata"));
+const storageConfig = multer.diskStorage({
+  destination: (req, file, cb) =>{
+      cb(null, "public/uploads");
+  },
+  filename: (req, file, cb) =>{
+      cb(null, Date.now() + "-" + file.originalname);
+  }
+});
+
+const fileFilter = (req, file, cb) => {
+if(file.mimetype === "image/png" || file.mimetype === "image/jpg" || file.mimetype === "image/jpeg") {
+    cb(null, true);
+  }
+  else{
+    cb(null, false);
+  }
+}
+
+let upload = multer({ storage: storageConfig, fileFilter: fileFilter });
+var cpUpload = upload.fields([{ name: 'img' }]);
 
 // Укажем роуты                   
 app.get("/", function (req, res) {
@@ -37,20 +54,11 @@ app.get("/rooms", function(req, res) {
   res.sendFile(__dirname + '/public/index.html');
 })
 
-app.post("/chat/upload", function (req, res, next) {
-  let filedata = req.file;
-  console.log(filedata);
-  
-  if(!filedata) {
-    res.send("Ошибка при загрузке файла");
-  } else {
-    res.send("Файл загружен");
-  }
-});
+// Задаем параметры статических папок
+app.use(express.static(path.join(__dirname, 'public')));
 
 const botName = 'Чат';
 let username, room;
-
 // Запуск при подключении клиентов
 io.on('connection', socket => {
 
@@ -58,6 +66,14 @@ io.on('connection', socket => {
     username = req.body.username
     room =  req.body.room
     res.sendFile(__dirname + '/public/chat.html');
+  });
+
+  app.post("/chat/upload", cpUpload, function (req, res, next) {
+    // let sender = req.body.username;
+    // let msg = req.body.msg;
+    let file = req.files['img'][0];
+    let imgMessage = { filePath: 'uploads/' + file.filename }
+    res.send(imgMessage);
   });
   
   socket.on('loadClient', async () => {
@@ -69,6 +85,7 @@ io.on('connection', socket => {
         messages.push(...res);
       })
     // }
+    
     socket.emit('joinToChat', username, room, messages);
     console.log(`Произошло извлечение ${messages.length} записей в комнату ${room}`);
   })
@@ -121,12 +138,12 @@ io.on('connection', socket => {
 
 
   // Прослушивание сообщения чата
-  socket.on('chatMessage', async (msg, sender, room) => {
+  socket.on('chatMessage', async (msg, sender, room, linkImg) => {
     const user = getCurrentUser(socket.id);
 
-    io.to(user.room).emit('message', formatMessage(user.username, msg));
+    io.to(user.room).emit('message', formatMessage(user.username, msg, linkImg));
 
-    await MsgsMongo({message: msg, sender, send_time: Date(), room: room })
+    await MsgsMongo({message: msg, sender, send_time: Date(), room: room, img: linkImg })
       .save((err) => {
         if (err) return handleError(err);
         console.log(`New message in DB ${msg}`);
@@ -158,6 +175,7 @@ io.on('connection', socket => {
 
 
 });
+
 
 const PORT = process.env.PORT || 5000;
 

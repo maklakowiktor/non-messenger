@@ -113,7 +113,6 @@ a {
 	background-color: #EFEFF4;
 	border-radius: 5px;
 	transition: .7s;
-	opacity: 0;
 }
 
 .chat-messages .message .meta {
@@ -297,6 +296,19 @@ label {
 	margin:2px 0px;
 	border-color:#555;
 }
+
+.img-inner-message {
+	padding: 10px;
+	text-align: center;
+}
+
+.img-inner-message>img {
+	max-width: 90%;
+	height: auto;
+	border-radius: 5px;
+}
+
+
 
 
 /* @media (max-width: 700px) {
