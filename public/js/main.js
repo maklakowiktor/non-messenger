@@ -59,16 +59,56 @@ socket.on('serverTyping', (name) => {
 chatForm.addEventListener('submit', e => {
   e.preventDefault();
   const msg = e.target.elements.msg.value;
-  console.log(msg);
-  console.log(e.target.elements.photo.files);
-  // socket.emit('chatMessage', msg, userChat.username, userChat.room);
+  const images = e.target.elements.photo.files[0];
+  if (images.length) {
+    return fetchImage(e);
+  }
+  socket.emit('chatMessage', msg, userChat.username, userChat.room);
+  e.target.elements.msg.value = '';
+  e.target.elements.msg.focus();
+});
+
+
+
+async function fetchImage(e) {
+  const msg = e.target.elements.msg.value;
+  const image = e.target.elements.photo.files[0];
+
+  const formData = new FormData();
+  const fileField = document.querySelector('input[type="file"]');
+
+  formData.append('username', userChat.username);
+  formData.append('avatar', fileField.files[0]);
+
+  try {
+    const response = await fetch('/chat/upload', {
+      method: 'PUT',
+      body: formData
+    });
+    const result = await response.json();
+    console.log('Успех:', JSON.stringify(result));
+  } catch (error) {
+    console.error('Ошибка:', error);
+  }
+
+
+
+  let response = await fetch('/article/formdata/post/user', {
+    method: 'POST',
+    body: new FormData(formElem)
+  });
+    let result = await response.json();
+    console.log(result.message);
+
+  // socket.emit('chatMessage', msg, userChat.username, userChat.room, images);
   // e.target.elements.msg.value = '';
   // e.target.elements.msg.focus();
-});
+}
 
 function countFiles(those) {
   let outCf = document.getElementById('countFiles');
   let cf = those.files.length;
+  console.log(those.files);
   if(cf == 0) {
     outCf.innerText = '';
   } else {
@@ -129,7 +169,7 @@ function typing() {
 
 window.addEventListener("contextmenu",function(event){
   event.preventDefault();
-  if(event.target.classList.contains('message') || event.target.classList.contains('meta') || event.target.classList.contains('text')) {
+  if(event.target.classList.contains('message') || event.target.classList.contains('meta') || event.target.classList.contains('text') || event.target.tagName == 'SPAN' ) {
     var contextElement = document.getElementById("context-menu");
     contextElement.style.top = event.clientY + "px";
     contextElement.style.left = event.clientX + "px";

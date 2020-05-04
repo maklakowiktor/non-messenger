@@ -24,6 +24,9 @@ const server = http.createServer(app);
 const io = socketio(server);
 
 // Задаем параметры статических папок
+app.use(express.static(path.join(__dirname, 'public')));
+// Используем middleware для загрузки изображений на сервер
+app.use(multer({dest: "uploads"}).single("filedata"));
 
 // Укажем роуты                   
 app.get("/", async function (req, res) {
@@ -37,14 +40,13 @@ app.get("/rooms", function(req, res) {
 app.post("/chat/upload", function (req, res, next) {
   let filedata = req.file;
   console.log(filedata);
-  if(!filedata)
-      res.send("Ошибка при загрузке файла");
-  else
-      res.send("Файл загружен");
+  
+  if(!filedata) {
+    res.send("Ошибка при загрузке файла");
+  } else {
+    res.send("Файл загружен");
+  }
 });
-
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(multer({dest: "uploads"}).single("filedata"));
 
 const botName = 'Чат';
 let username, room;
@@ -67,7 +69,6 @@ io.on('connection', socket => {
         messages.push(...res);
       })
     // }
-    
     socket.emit('joinToChat', username, room, messages);
     console.log(`Произошло извлечение ${messages.length} записей в комнату ${room}`);
   })
