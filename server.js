@@ -29,7 +29,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(multer({dest: "uploads"}).single("filedata"));
 
 // Укажем роуты                   
-app.get("/", async function (req, res) {
+app.get("/", function (req, res) {
   res.sendFile(__dirname + '/public/login.html');
 });
 
