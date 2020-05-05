@@ -120,7 +120,7 @@ function outputMessage(message) {
   if(message.linkImg) {
     divt.innerHTML = divt.innerHTML + `<div class="img-inner-message"><img src="${message.linkImg}"></div>`
   }
-// Соединяем всё элементы
+  // Соединяем всё элементы
   div.appendChild(p);
   div.appendChild(divt);
 // Присоединяем готовое сообщение ко всему диалогу
@@ -164,19 +164,55 @@ function typing() {
   socket.emit('serverTyping', userChat.username, userChat.room);
 }
 
-window.addEventListener("contextmenu",function(event){
-  event.preventDefault();
-  if(event.target.classList.contains('message') || event.target.classList.contains('meta') || event.target.classList.contains('text') || event.target.tagName == 'SPAN' ) {
-    var contextElement = document.getElementById("context-menu");
-    contextElement.style.top = event.clientY + "px";
-    contextElement.style.left = event.clientX + "px";
-    contextElement.classList.add("active");
-  } else {
-    document.getElementById("context-menu").classList.remove("active");
-  }
+// window.addEventListener("contextmenu",function(event){
+//   event.preventDefault();
+//   if(event.target.classList.contains('message') || event.target.classList.contains('meta') || event.target.classList.contains('text') || event.target.tagName == 'SPAN' || event.target.tagName == 'INPUT') {
+//     var contextElement = document.getElementById("context-menu");
+//     contextElement.style.top = event.clientY + "px";
+//     contextElement.style.left = event.clientX + "px";
+//     contextElement.classList.add("active");
+//   } else {
+//     document.getElementById("context-menu").classList.remove("active");
+//   }
   
-});
+// });
 
-window.addEventListener("click",function(){
-  document.getElementById("context-menu").classList.remove("active");
+// window.addEventListener("click",function(){
+//   document.getElementById("context-menu").classList.remove("active");
+// });
+
+window.addEventListener('contextmenu', e => {
+  event.preventDefault();
+})
+
+window.addEventListener('mousedown', event => {
+  if(event.button == 0) {
+    document.getElementById("context-menu").classList.remove("active");
+  } else if(event.button == 1){
+    document.getElementById("context-menu").classList.remove("active");
+  } else if(event.button == 2){
+    // console.log('Вы кликнули правой клавишей');
+    if(document.getElementById("context-menu").classList.contains('active')) {
+      document.getElementById("context-menu").classList.remove("active");
+    } else {
+      if(event.target.classList.contains('message') || event.target.classList.contains('meta') || event.target.classList.contains('text') || event.target.tagName == 'SPAN' || event.target.tagName == 'INPUT' || event.target.classList.contains('img-inner-message') ) {
+        console.log(event.target);
+        let contextElement = document.getElementById("context-menu");
+        contextElement.style.top = event.clientY + "px";
+        contextElement.style.left = event.clientX + "px";
+        contextElement.classList.add("active");
+      } else {
+        document.getElementById("context-menu").classList.remove("active");
+      }
+    }
+  }
+
+  document.querySelector('.chat-messages').addEventListener('scroll', function() {
+    console.log(pageYOffset + 'px');
+    if(document.getElementById("context-menu").classList.contains('active')) {
+      document.getElementById("context-menu").classList.remove("active");
+    }
+  });
+
+
 });

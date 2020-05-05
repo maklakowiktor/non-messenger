@@ -303,7 +303,7 @@ label {
 }
 
 .img-inner-message>img {
-	max-width: 90%;
+	max-width: 50%;
 	height: auto;
 	border-radius: 5px;
 }
