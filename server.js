@@ -82,10 +82,14 @@ io.on('connection', socket => {
       await MsgsMongo
       .find({ room }, (err, res) => {
         if (err) return console.error(err);
-        messages.push(...res);
+        while (res) {
+          if (res) {
+            messages.push(...res);
+            break;
+          }
+        }
       })
     // }
-    
     socket.emit('joinToChat', username, room, messages);
     console.log(`Произошло извлечение ${messages.length} записей в комнату ${room}`);
   })
