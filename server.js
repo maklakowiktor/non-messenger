@@ -76,20 +76,18 @@ io.on('connection', socket => {
     res.send(imgMessage);
   });
   
-  socket.on('loadClient', async () => {
+  socket.on('loadClient', () => {
     let messages = [];
     // while (!messages.length) {
-      await MsgsMongo
+    MsgsMongo
       .find({ room }, (err, res) => {
         if (err) return console.error(err);
-        while (res) {
-          console.log(res);
-          messages.push(...res);
-        }
+        console.log(res.length);
+        messages.push(...res);
+        socket.emit('joinToChat', username, room, messages);
+        console.log(`Произошло извлечение ${messages.length} записей в комнату ${room}`);
       })
     // }
-    socket.emit('joinToChat', username, room, messages);
-    console.log(`Произошло извлечение ${messages.length} записей в комнату ${room}`);
   })
 
 
