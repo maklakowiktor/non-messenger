@@ -83,10 +83,8 @@ io.on('connection', socket => {
       .find({ room }, (err, res) => {
         if (err) return console.error(err);
         while (res) {
-          if (res) {
-            messages.push(...res);
-            break;
-          }
+          console.log(res);
+          messages.push(...res);
         }
       })
     // }
